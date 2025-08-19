@@ -10,11 +10,13 @@ var imagekit = new ImageKit({
 
 export async function uploadFile(file,filename) {
     return new Promise((resolve, reject) => {
-        imagekit.upload({
+        imagekit.upload(
+            {
             file: file.buffer, // required
             fileName: filename, // required
             folder: "n22-social-application" // optional
-        }, function(error, result) {
+        },
+         function(error, result) {
             if (error) {
                 reject(error);
             } else {

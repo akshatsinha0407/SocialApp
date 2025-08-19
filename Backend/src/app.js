@@ -2,6 +2,9 @@
 import cookieParser from "cookie-parser"
 import authRoutes from "./routes/auth.routes.js"
 import postRoutes from "./routes/post.routes.js"
+//updtae
+import chatRoutes from "./routes/chat.routes.js"
+
 
 const app = express()
 app.use(express.json())
@@ -13,6 +16,8 @@ app.get("/", (req, res) => {
 })
 app.use('/auth', authRoutes)
 app.use('/posts', postRoutes)
+//update
+app.use('/chat', chatRoutes)
 
 
 export default app

@@ -1,18 +1,16 @@
 import { Server } from "socket.io";
 import cookie from "cookie"
 import jwt from "jsonwebtoken";
+//update
+import { createMessage } from "../dao/message.dao.js";
 
-const users = {} //Yeh object track karta hai ki kon sa user (MongoDB ID) kis socket ID se connected hai.
+const users = {}
 
-
-//Main Function
-function setupSocket(server) { 
+function setupSocket(server) { // http server
 
     const io = new Server(server, {})
-    //HTTP server ko pass karke Socket.IO server banata hai.
 
 
-    //Authentication Middleware
     io.use((socket, next) => {
         const cookies = socket.request.headers.cookie
         const { token } = cookie.parse(cookies || "")
@@ -32,46 +30,31 @@ function setupSocket(server) {
 
     })
 
-    // Connection Handling
     io.on("connection", (socket) => {
 
-        users[ socket.user._id ] = socket.id  // User ka mapping store karta hai
+        users[ socket.user._id ] = socket.id
         console.log(users)
-        //Jab koi user connect hota hai to uska user ID aur socket ID map kar deta hai.
 
-
-        //Disconnect Handling
         socket.on("disconnect", () => {
             console.log("A user disconnected");
         });
-       //Jab user disconnect hota hai to console mein log karta hai.
 
-
-        // Message Handling
-        socket.on("message", (msg) => {
+        
+        // update
+        socket.on("message", async (msg) => {
 
             const { receiver /* mongodb id */, message } = msg
             socket.to(users[ receiver ]).emit("message", message)
-
+            await createMessage({
+                receiver,
+                sender: socket.user._id,
+                text: message
+            })
         })
-
-        /*
-        Summary 📋
-               setupSocket: HTTP server par Socket.IO server banata hai.
-
-               io.use: Authentication middleware hai jo JWT token se user ko verify karta hai.
-
-               io.on("connection"): Connection successful hone par chalta hai.
-
-               users object: Online users ki mapping maintain karta hai.
-
-               socket.on("message"): Client se aane waale messages ko sunta hai aur unhe receiver tak pahunchata hai.
-        */
-
 
         // Add more event listeners as needed
     });
 
 }
 
-export default setupSocket;
+export default setupSocket; 
